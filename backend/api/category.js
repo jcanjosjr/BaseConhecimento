@@ -31,17 +31,17 @@ module.exports = app => {
         try {
             existsOrError(req.params.id, 'Código da Categoria não informado.')
 
-            // verifying categories associates
+            // verifying categories associates.
             const subcategory = await app.db('categories')
                 .where({ parendId: req.params.id })
             notExistsOrError(subcategory, 'Categoria possui subcategorias.')
 
-            // verifying articles associates
+            // verifying articles associates.
             const articles = await app.db('articles')
                 .where({ categoryId: req.params.id })
             notExistsOrError(articles, 'Categoria possui artigos.')
 
-            // verifying if categorie exists
+            // verifying if categorie exists.
             const rowDeleted = await app.db('categories')
                 .where({ id: req.params.id }).del()
             existsOrError(rowDeleted, 'Categoria não foi encontrada.')
@@ -52,7 +52,7 @@ module.exports = app => {
         }
     }
 
-    // making a relative path about categories and categories associates
+    // making a relative path about categories and categories associates.
     const withPath = categories => {
         const getParent = (categories, parentId) => {
             const parent = categories.filter(parent => parent.id === parentId)
@@ -63,7 +63,7 @@ module.exports = app => {
             let path = category.name
             let parent = getParent(categories, category.parentId)
     
-            // looking for more parents on categories
+            // looking for more parents on categories.
             while(parent) {
                 path = `${parent.name} > ${path}`
                 parent = getParent(categories, parent.parendId)
@@ -72,7 +72,7 @@ module.exports = app => {
             return { ...category, path }
         })
 
-        // ordering the path
+        // ordering the path.
         categoriesWithPath.sort((a, b) => {
             if(a.path < b.path) return -1
             if(a.path > b.path) return 1
@@ -82,12 +82,14 @@ module.exports = app => {
         return categoriesWithPath
     }
 
+    // method get from category.
     const get = (req, res) => {
         app.db('categories')
             .then(categories => res.json(withPath(categories)))
             .catch(err => res.status(500).send(err))
     }
 
+    // method get by id.
     const getById = (req, res) => {
         app.db('categories')
         .where({ id: req.params.id })
@@ -96,7 +98,25 @@ module.exports = app => {
         .catch(err => res.status(500).send(err))
     }
 
-    return { save, remove, get, getById }
+    // transforms a list(array) of categorys on a tree struct
+    const toTree = (categories, tree) => {
+        if(!tree) tree = categories.filter(c => !c.parentId)
+        tree = tree.map(parentNode => {
+            const isChild = node => node.parentId == parentNode.id
+            parentNode.children = toTree(categories, categories.filter(isChild))
+            return parentNode
+        })
+        return tree
+    }
+
+    // method to get tree
+    const getTree = (req, res) => {
+        app.db('categories')
+            .then(categories => res.json(toTree(withPath(categories))))
+            .catch(err => res.status(500).send(err))
+    }
+
+    return { save, remove, get, getById, getTree }
 
 }
 

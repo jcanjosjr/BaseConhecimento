@@ -3,11 +3,11 @@ const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
     // import functions from validation of users.
-    const { existsOrError, notExistsOrError, EqualsOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError } = app.api.validation
 
     // making a Cript Password
     const encryptPassword = password => {
-        const salt = bcrypt.genSaltScync(10)
+        const salt = bcrypt.genSaltSync(10)
         return bcrypt.hashSync(password, salt)
     }
 
@@ -22,9 +22,11 @@ module.exports = app => {
             existsOrError(user.email, 'E-mail não informado.')
             existsOrError(user.password, 'Senha não informada.')
             existsOrError(user.confirmPassword, 'Confirmação de senha inválida.')
-            EqualsOrError(user.password, user.confirmPassword, 'Senhas não conferem.')
+            equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem.')
         
-            const userFromDB = await app.db('users').where({ email: user.email }).first()
+            const userFromDB = await app.db('users')
+                .where({ email: user.email })
+                .first()
             if(!user.id) {
                 notExistsOrError(userFromDB, 'Usuário já cadastrado.')
             }    
