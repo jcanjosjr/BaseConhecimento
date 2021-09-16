@@ -1,4 +1,4 @@
-const queries = require('./queries')
+const queries = require('./queries.js')
 
 module.exports = app => {
     const { existsOrError } = app.api.validation
@@ -15,7 +15,7 @@ module.exports = app => {
             existsOrError(article.userId, 'Autor não informado.')
             existsOrError(article.content, 'Conteúdo não informado.')
         } catch(msg) {
-            res.status(400).send(msg)
+            res.status(401).send(msg)
         }
 
         if(article.id) {
@@ -83,8 +83,8 @@ module.exports = app => {
         const categories = await app.db.raw(queries.categoryWithChildren, categoryId)
         const ids = categories.rows.map(c => c.id)
 
-        // making a alias from tables.
-        app.db({a: 'articles', u: 'users'})
+        // making a alias from tables and getting a consult
+        app.db({ a: 'articles', u: 'users' })
             .select ('a.id', 'a.name', 'a.description', 'a.imageUrl', { author: 'u.name' })
             .limit(limit).offset(page * limit - limit)
             .whereRaw('?? = ??', ['u.id', 'a.userId'])
