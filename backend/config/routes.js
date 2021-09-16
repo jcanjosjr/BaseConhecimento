@@ -1,3 +1,5 @@
+const admin = require('./admin')
+
 module.exports = app => {
     
     //Token Validation!
@@ -7,41 +9,49 @@ module.exports = app => {
 
     //Users!
     app.route('/users')
-        .post(app.api.user.save)
-        .get(app.api.user.get)
+        .all(app.config.passport.authenticate())
+        .post(admin(app.api.user.save))
+        .get(admin(app.api.user.get))
 
     //Users with ID.
     app.route('/users/:id')
-        .put(app.api.user.save)
-        .get(app.api.user.getById)
+        .all(app.config.passport.authenticate())
+        .put(admin(app.api.user.save))
+        .get(admin(app.api.user.getById))
 
     // Categories!
     app.route('/categories')
-        .get(app.api.category.get)
-        .post(app.api.category.save)
+        .all(app.config.passport.authenticate())
+        .get(admin(app.api.category.get))
+        .post(admin(app.api.category.save))
     
     // Careful with order of routes! Categories with Tree!
     app.route('/categories/tree')
+        .all(app.config.passport.authenticate())
         .get(app.api.category.getTree)
 
     // Categories with ID!
     app.route('/categories/:id')
+        .all(app.config.passport.authenticate())
         .get(app.api.category.getById)
-        .put(app.api.category.save)
-        .delete(app.api.category.remove)
+        .put(admin(app.api.category.save))
+        .delete(admin(app.api.category.remove))
     
     // Articles!
     app.route('/articles')
-        .get(app.api.article.get)
-        .post(app.api.article.save)
+        .all(app.config.passport.authenticate())
+        .get(admin(app.api.article.get))
+        .post(admin(app.api.article.save))
     
     // Articles with ID!
     app.route('/articles/:id')
+        .all(app.config.passport.authenticate())
         .get(app.api.article.getById)
-        .put(app.api.article.save)
-        .delete(app.api.article.remove)
+        .put(admin(app.api.article.save))
+        .delete(admin(app.api.article.remove))
 
     // Articles in Categories!
     app.route('/categories/:id/articles')
+        .all(app.config.passport.authenticate())
         .get(app.api.article.getByCategory)
 }
