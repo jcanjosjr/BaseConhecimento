@@ -1,12 +1,12 @@
 module.exports = app => {
-    // Validate if Exists.
+    // validate method exists.
     function existsOrError(value, msg) {
         if(!value) throw msg
         if(Array.isArray(value) && value.length === 0) throw msg
         if(typeof value === 'string' && !value.trim()) throw msg
     }
     
-    // Validate if don't Exists.
+    // validate method don't Exists.
     function notExistsOrError(value, msg) {
         try {
             existsOrError(value, msg)
@@ -16,7 +16,7 @@ module.exports = app => {
         throw msg
     }
     
-    // Validate if are equals.
+    // validate method are equals.
     function equalsOrError(valueA, valueB, msg) {
         if(valueA !== valueB) throw msg
     }
