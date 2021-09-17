@@ -1,3 +1,11 @@
 module.exports = {
-    authSecret: 'abc'
+    authSecret: 'afsdfs24235fsdfsgsdagfs23',
+    db: {
+        host: '127.0.0.1',
+        port: 5432,
+        database: '',
+        user: '',
+        password: ''
+    },
+    mongod: 'localhost'
 }

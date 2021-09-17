@@ -12,6 +12,7 @@ module.exports = app => {
         // getting user
         const user = await app.db('users')
             .where({ email: req.body.email })
+            .whereNull('deletedAt')
             .first()
         
         // validating user
