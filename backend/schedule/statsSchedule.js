@@ -3,7 +3,7 @@ const schedule = require('node-schedule')
 module.exports = app => {
     // using the scheduler to get the application statistics!
     schedule.scheduleJob('*/1 * * * *', async function () {
-        const usersCount = await app.db('users').count('id').first()
+        const usersCount = await app.db('users').count('id').first().whereNull('deletedAt')
         const categoriesCount = await app.db('categories').count('id').first()
         const articlesCount = await app.db('articles').count('id').first()
     
