@@ -5,13 +5,13 @@
       <div class="admin-pages-tabs">
         <b-card no-body>
           <b-tabs card>
-              <b-tab title="Artigos" active>
+              <b-tab title="Artigos" active title-item-class="mytab">
                   <ArticleAdmin />
               </b-tab>
-              <b-tab title="Categorias">
+              <b-tab title="Categorias" title-item-class="mytab">
                 <CategoryAdmin />
               </b-tab>
-              <b-tab title="Usuários">
+              <b-tab title="Usuários" title-item-class="mytab">
                 <UserAdmin />
               </b-tab>
           </b-tabs>
@@ -34,5 +34,11 @@ export default {
 </script>
 
 <style>
+    .mytab .nav-link {
+      color: black !important;
+    }
 
+    .mytab .nav-link.active {
+    background-color: #ffc107 !important;
+  }
 </style>
