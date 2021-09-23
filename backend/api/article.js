@@ -1,27 +1,26 @@
-const queries = require('./queries.js')
+const queries = require('./queries')
 
 module.exports = app => {
     const { existsOrError } = app.api.validation
 
-    // saving a article.
     const save = (req, res) => {
         const article = { ...req.body }
         if(req.params.id) article.id = req.params.id
 
         try {
-            existsOrError(article.name, 'Nome não informado.')
-            existsOrError(article.description, 'Descrição não informada.')
-            existsOrError(article.categoryId, 'Categoria não informada.')
-            existsOrError(article.userId, 'Autor não informado.')
-            existsOrError(article.content, 'Conteúdo não informado.')
+            existsOrError(article.name, 'Nome não informado')
+            existsOrError(article.description, 'Descrição não informada')
+            existsOrError(article.categoryId, 'Categoria não informada')
+            existsOrError(article.userId, 'Autor não informado')
+            existsOrError(article.content, 'Conteúdo não informado')
         } catch(msg) {
-            res.status(401).send(msg)
+            res.status(400).send(msg)
         }
 
         if(article.id) {
             app.db('articles')
                 .update(article)
-                .where( { id: article.id })
+                .where({ id: article.id })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
@@ -32,17 +31,15 @@ module.exports = app => {
         }
     }
 
-    // remove a article
     const remove = async (req, res) => {
         try {
             const rowsDeleted = await app.db('articles')
-                .where ({ id: req.params.id }).del()
-                
+                .where({ id: req.params.id }).del()
+            
             try {
                 existsOrError(rowsDeleted, 'Artigo não foi encontrado.')
-                
             } catch(msg) {
-                return res.status(400).send
+                return res.status(400).send(msg)    
             }
 
             res.status(204).send()
@@ -51,9 +48,8 @@ module.exports = app => {
         }
     }
 
-    // limit from pagination 
-    const limit = 10
-    const get = async(req, res) => {
+    const limit = 10 // usado para paginação
+    const get = async (req, res) => {
         const page = req.query.page || 1
 
         const result = await app.db('articles').count('id').first()
@@ -83,9 +79,8 @@ module.exports = app => {
         const categories = await app.db.raw(queries.categoryWithChildren, categoryId)
         const ids = categories.rows.map(c => c.id)
 
-        // making a alias from tables and getting a consult
-        app.db({ a: 'articles', u: 'users' })
-            .select ('a.id', 'a.name', 'a.description', 'a.imageUrl', { author: 'u.name' })
+        app.db({a: 'articles', u: 'users'})
+            .select('a.id', 'a.name', 'a.description', 'a.imageUrl', { author: 'u.name' })
             .limit(limit).offset(page * limit - limit)
             .whereRaw('?? = ??', ['u.id', 'a.userId'])
             .whereIn('categoryId', ids)
